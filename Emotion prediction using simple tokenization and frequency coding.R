@@ -8,11 +8,9 @@ library(widyr)
 # Loading data to use
 emotion.data <-
 read_delim(
-  file = "C:/Users/Erhun/Documents/Data Analysis/Projects/Reccomendation System/Data/Kaggle Emotions Datasets/train.txt",
-  delim = ";",
-  col_names = FALSE
-) %>%
-  rename(text = X1, emotion = X2)
+  "https://raw.githubusercontent.com/Erhun-Joel/book-recommedation-system/refs/heads/main/Data/Kaggle%20Emotions%20Datasets/train.txt",
+  col_names = c("text", "emotion")
+)
 emotion.data
 
 # Check number of emotions present
@@ -29,6 +27,7 @@ emotion.count <- emotion.data %>%
   count(emotion, word, sort = TRUE)
 emotion.count
 
+# Computing term frequencies
 emotion.tfidf <-
 emotion.data %>%
   mutate(
