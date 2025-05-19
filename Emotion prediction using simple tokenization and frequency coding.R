@@ -1,5 +1,9 @@
 # Loading required libraries
 library(tidyverse)
+library(tidymodels)
+library(tidytext)
+library(SnowballC)
+library(widyr)
 
 # Loading data to use
 emotion.data <-
@@ -7,19 +11,25 @@ read_delim(
   file = "C:/Users/Erhun/Documents/Data Analysis/Projects/Reccomendation System/Data/Kaggle Emotions Datasets/train.txt",
   delim = ";",
   col_names = FALSE
-)
-emotion.data
-
-# Changing column names
-colnames(emotion.data) = c("text", "emotion")
+) %>%
+  rename(text = X1, emotion = X2)
 emotion.data
 
 # Check number of emotions present
 emotion.data %>%
   count(emotion)
 
-# Begining text analysis
-library(tidytext)
+# Beginning text analysis
+emotion.count <- emotion.data %>%
+  unnest_tokens(word, text) %>%
+  mutate(
+    word = str_replace_all(word, "'", ""),
+    word = wordStem(word)
+  ) %>%
+  count(emotion, word, sort = TRUE)
+emotion.count
+
+emotion.tfidf <-
 emotion.data %>%
   mutate(
     id = 1:dim(emotion.data)[1]
@@ -27,24 +37,36 @@ emotion.data %>%
   unnest_tokens(word, text) %>%
   count(id, emotion, word) %>%
   bind_tf_idf(term = word, document = id, n = n)
+emotion.tfidf
 
-# Loading modeling libraries
-library(tidymodels)
-library(textrecipes)
-
-# Defining preprocessing steps
-emotion.recipe <-
-recipe(emotion ~ text, data = emotion.data) %>%
-  step_tokenize(text) %>%
-  step_tokenfilter(text, max_tokens = 2000) %>%
-  step_tfidf(text) %>%
-  step_normalize(all_numeric_predictors())
-emotion.recipe
+# Checking out words with highest separation grades
+emotion.tfidf %>%
+  arrange(-tf_idf)
 
 # Setting out training sections of the data
 set.seed(457)
 train = sample(1:dim(emotion.data)[1], size = dim(emotion.data)[1]*0.8)
 head(train)
+
+# Defining pre-processing steps
+emotion.recipe <-
+recipe(emotion ~ text, data = emotion.data[train,]) %>%
+  step_tokenize(text) %>%
+  step_stem(text) %>%
+  step_tokenfilter(text, max_tokens = 3000) %>%
+  step_tfidf(text) %>%
+  step_normalize(all_numeric_predictors())
+emotion.recipe
+
+# Check out list of tokens being used
+selected.tokens <-
+emotion.recipe %>%
+  prep %>%
+  juice %>%
+  select(-emotion) %>%
+  colnames() %>%
+  str_remove("tfidf_text_")
+selected.tokens
 
 # Setting out resamples
 set.seed(231)
@@ -58,6 +80,7 @@ rf.spec <- rand_forest() %>%
 rf.spec
 
 # Now fit to resamples
+doParallel::registerDoParallel()
 set.seed(124)
 rf.results <- workflow(
   preprocessor = emotion.recipe,
@@ -77,32 +100,19 @@ rf.results %>%
 
 # See out confusion matrics
 conf_mat_resampled(rf.results, tidy = FALSE)
+# Seems too good to be true
 
-# Also apply smote to balance out unbalanced classes
-library(themis)
-
-# Redefining recipe
-emotion.recipe <-
-recipe(emotion ~ text, data = emotion.data) %>%
-  step_tokenize(text) %>%
-  step_stopwords(text) %>%
-  step_tokenfilter(text, max_tokens = 2000) %>%
-  step_tfidf(text) %>%
-  step_normalize(all_numeric_predictors()) %>%
-  step_smote(emotion)
-emotion.recipe
-
-# Getting out final results
+# Lets get the random forest fit and test!
 
 # Getting test numerics
-data.rows = 1:dim(emotion.data)[1]
+data.rows <- 1:dim(emotion.data)[1]
 length(data.rows)
 
-test = data.rows[!data.rows %in% train]
+test <- data.rows[!data.rows %in% train]
 test
 
-# Making final fit results
-final.fit.results <-
+# Making fit
+first.results <-
 workflow(
   preprocessor = emotion.recipe,
   spec = rf.spec
@@ -116,19 +126,45 @@ workflow(
       data = emotion.data
     )
   )
-final.fit.results
+first.results
 
 # Check out the result
-final.fit.results %>%
+first.results %>%
   collect_metrics
 
 # Extract workflow
 bundled.workflow <-
-final.fit.results %>%
+first.results %>%
   extract_workflow()
 bundled.workflow
 
 # Testing on actual data
 bundled.workflow %>%
   predict(tibble(text = c("I had a good day today", "I did not have a good day today")))
-# We see that the model does not understand context. Instead of using a more complicated model, lets work on the features to improve it
+# We see that the model does not understand context
+# Instead of using a more complicated model, lets work on the features to improve it
+
+test.results <-
+bundled.workflow %>%
+  predict(emotion.data[-train,]) %>%
+  bind_cols(predict(bundled.workflow, emotion.data[-train,], type = "prob")) %>%
+  bind_cols(
+    emotion.data[-train,] %>%
+      select(emotion) %>%
+      mutate(emotion = as.factor(emotion))
+  )
+test.results
+
+# Create custom metrics function
+my.metric <- metric_set(roc_auc, sensitivity, specificity, accuracy)
+my.metric
+
+# Check out metrics
+test.results %>%
+  my.metric(
+    truth = emotion,
+    estimate = .pred_class,
+    .pred_anger:.pred_surprise
+  )
+# Impressive for first try.
+
