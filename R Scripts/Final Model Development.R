@@ -203,8 +203,9 @@ probabilities
 # 2. The extreme class imbalance of anger from this model
 probabilities <-
 probabilities %>%
-  mutate(title = str_remove(title, "[:punct:]+ Or .*"))
-
+  mutate(title = str_remove(title, "[:punct:]+ Or .*")) %>%
+  select(title, .pred_class:.pred_surprise)
+probabilities
 
 # The extreme class imbalance would be handled in the actual implementation by penalizing a certain value
 
