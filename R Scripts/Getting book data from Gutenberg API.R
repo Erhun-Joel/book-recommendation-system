@@ -59,6 +59,7 @@ book.data
 
 # Save data into needed folder using the write.csv function below
 # Due to size restrictions, they would be broken down into subsets
+
 # write.csv(book.data[(book.data$id %in% c(1:40000)),], file = "---book_library_first.csv")
 # write.csv(book.data[!(book.data$id %in% c(1:40000)),], file = "---book_library_second.csv")
 

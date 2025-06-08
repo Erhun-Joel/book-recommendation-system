@@ -4,11 +4,14 @@ library(tidymodels)
 library(tidytext)
 library(SnowballC)
 
+# Also load text recipe library for later
+library(textrecipes)
+
 # Loading data
 # Loading data to use
 emotion.data <-
 read_delim(
-  "https://raw.githubusercontent.com/Erhun-Joel/book-recommedation-system/refs/heads/main/Data/Kaggle%20Emotions%20Datasets/train.txt",
+  "https://raw.githubusercontent.com/Erhun-Joel/book-recommendation-system/refs/heads/main/Data/Kaggle%20Emotions%20Datasets/train.txt",
   col_names = c("text", "emotion")
 )
 emotion.data
@@ -100,9 +103,6 @@ autoplot(logistic.resamples)
 # Tuning random forest due to processor speed constraints remains outside the scope of this project
 # Lets remake and save our best performing model
 
-# Load text recipe library
-library(textrecipes)
-
 # Create spec
 rf.spec <- rand_forest(trees = 1000) %>%
   set_mode("classification") %>%
@@ -168,45 +168,43 @@ rf.result %>%
 # Read book library into local environment
 book.library <-
 read.csv(
-  "https://raw.githubusercontent.com/Erhun-Joel/book-recommendation-system/refs/heads/main/Gutendex%20API%20response/book_library.csv"
+  "https://raw.githubusercontent.com/Erhun-Joel/book-recommendation-system/refs/heads/main/Gutendex%20API%20response/book_library_first.csv"
 ) %>%
-  as_tibble()
+  as_tibble() %>%
+  bind_rows(
+    read.csv(
+      "https://raw.githubusercontent.com/Erhun-Joel/book-recommendation-system/refs/heads/main/Gutendex%20API%20response/book_library_second.csv"
+    ) %>%
+      as_tibble
+  ) %>%
+  select(-X)
 book.library
+
+# Read rds model back from github
+rf.fit <-
+readRDS(gzcon(url("https://raw.githubusercontent.com/Erhun-Joel/book-recommendation-system/refs/heads/main/rf_fit.rds")))
+rf.fit
 
 # Get list of probabilities using rf.result's model
 probabilities <-
 book.library %>%
+  select(id) %>%
   bind_cols(
-    rf.result %>%
-      extract_workflow() %>%
+    rf.fit %>%
       predict(
         book.library %>%
           select(description) %>%
-          rename(text = description)
-      ) %>%
-      bind_cols(
-        rf.result %>%
-          extract_workflow() %>%
-          predict(
-            book.library %>%
-              select(description) %>%
-              rename(text = description),
-            type = "prob"
-          )
+          rename(text = description),
+        type = "prob"
       )
-  ) %>%
-  select(-X, )
+  )
 probabilities
 
 # Two things needs to be rectified for this dataset to be usable
 # 1. Occassional existence of two titles for a single book
 # 2. The extreme class imbalance of anger from this model
-probabilities <-
-probabilities %>%
-  mutate(title = str_remove(title, "[:punct:]+ Or .*")) %>%
-  select(title, .pred_class:.pred_surprise)
-probabilities
+
 
 # The extreme class imbalance would be handled in the actual implementation by penalizing a certain value
 
-#write.csv(probabilities, "")
+#write.csv(probabilities, "---probabilities.csv")

@@ -1,4 +1,4 @@
 This text is to clarify tokenization rules
 
-- In genre; all "&" is changed to "," and treated as separate
-- In authors; different authors are divided by "|"
+- In subjects; all "&" is changed to "," and treated as separate
+- In authors; different authors are divided by " & "
