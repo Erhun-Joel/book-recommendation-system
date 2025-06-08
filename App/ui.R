@@ -1,34 +1,8 @@
-# Loading needed libraries
-library(shiny)
-
-# Defining server
-server <- function(input, output){}
-
-# Defining style of ui using css
-styles.css <-
-"
-body, .sidebar, .mainbar {
-background-color: #d3d3d3;
-border-color: #d3d3d3;
-}
-
-.main {
-padding: 150px;
-}
-
-.left__column,
-.right__column {
-padding: 3px;
-}
-"
-
 # Defining user interface
 ui <- fluidPage(
   # Setting out head html commands
   tags$head(
-    tags$style(
-      HTML(styles.css)
-    )
+    tags$link(rel = "stylesheet", href = "styles.css")
   ),
 
   # Main container
@@ -55,7 +29,3 @@ ui <- fluidPage(
     )
   )
 )
-
-# Run Shiny App
-shinyApp(ui, server)
-
