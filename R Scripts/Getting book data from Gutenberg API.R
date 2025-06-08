@@ -1,142 +1,66 @@
-# To get book library from Gutenberg API
+# |-------------------------- To get book library from Gutenberg API --------------------------|
 
 # Loading required libraries
 library(tidyverse)
 library(httr)
 
 # Creating function to automatally collect API data
-get.book.data <- function(){
-
-  # Declaring base url
-  base.url = "https://gutendex.com/books/?page="
-
-  # Declaring page number variable
-  page = 1
-
-  # Defining dataset variables
-  title = c()
-  description = c()
-  language = c()
-  genre = c()
-  tags = c()
-  authors = c()
-
-  # Creating infinity loop only to break when no other page exist
-  while(TRUE){
-
-    # Getting API response
-    response = GET(paste0(base.url, page))
-
-    # Parsing out API response
-    response.content = content(response)
-
-    # Creating loop for number of books gotten
-    for(i in 1:length(response.content$results)){
-
-      # Appending out contents
-      # Using if statements to handle NULL values
-
-      # Appending title contents
-      if(!is.null(response.content$results[[i]]$title)){
-        title = c(title, response.content$results[[i]]$title)
-      }else{
-        title = c(title, NA)
-      }
-
-      # Appending description contents
-      if(!is.null(response.content$results[[i]]$summaries) && length(response.content$results[[i]]$summaries) != 0){
-        description = c(description, paste(as_vector(response.content$results[[i]]$summaries), collapse = "----------"))
-      }else{
-        description = c(description, NA)
-      }
-
-      # Appending language contents
-      if(!is.null(response.content$results[[i]]$languages[[1]])){
-        language = c(language, response.content$results[[i]]$languages[[1]])
-      }else{
-        language = c(language, NA)
-      }
+get.book.data <- 
+  function(){
+    # Declare While relate functions
+    next_address <- "Not Null"
+    i <- 1
+  
+    # Declare response list
+    response_list <- c()
+  
+    # Get all page responses
+    while(!is.null(next_address)){
+      gutenberg.api <- paste0("https://gutendex.com/books/?page=", i)
+  
+      gutendex.response <- GET(gutenberg.api)
+  
+      gutendex.content <- content(gutendex.response)
+  
+      response_list <- c(
+        response_list,
+        gutendex.content$results
+      )
+  
+      i = i + 1
       
-      # Dealing with slightly complicated contents
-
-      # Formating tags and combining to tag vector
-      if(!is.null(response.content$results[[i]]$subjects)){
-        tag.specific = paste(as_vector(response.content$results[[i]]$subjects), collapse = ", ")
-        tags = c(tags, tag.specific)
-      }else{
-        tags = c(tags, NA)
-      }
-
-      # Formating genre data and combining to genre vector
-      if(!is.null(response.content$results[[i]]$bookshelves)){
-        genre.specific = as_vector(response.content$results[[i]]$bookshelves) %>%
-          str_remove("Browsing: ") %>%
-          paste(collapse = ", ")
-        genre = c(genre, genre.specific)
-      }else{
-        genre = c(genre, NA)
-      }
-      
-      # Frormating author data and combining to author vector
-      if(!is.null(response.content$results[[i]]$authors) && length(response.content$results[[i]]$authors) != 0){
-
-        # Declare mini variable for combining multiple authors of same book
-        authors.initial = c()
-
-        # Initializing for-loop of length equal to number of authors
-        for(l in 1:length(response.content$results[[i]]$authors)){
-          # Inputing mini-variable with author names
-          authors.initial = c(authors.initial, response.content$results[[i]]$authors[[l]]$name)
+      if (i %% 200 == 0) message("We are now at page number ", i)
+      next_address <- gutendex.content[["next"]]
+  
+    }
+  
+    # Get out response data
+    output.data <-
+    response_list %>%
+      map_dfr(
+        .f = function(x){
+          tibble(
+            id = if (!is.null(x$id)) x$id else NA_character_,
+            title = if(!is.null(x$title)) x$title else NA_character_,
+            description = if (!is.null(x$summaries)) paste0(unlist(x$summaries), collapse = " --|-- ") else NA_character_,
+            language = if (!is.null(x$languages)) paste0(unname(unlist(x$languages)), collapse = " & ") else NA_character_,
+            subjects = if (!is.null(x$subjects)) paste0(unique(trimws(str_remove(unlist(map(x$subjects, function(x) str_split(x, " -- |, "))), "\\(.*?\\)"))), collapse = " & ") else NA_character_,
+            image_urls = if (!is.null(x$formats$`image/jpeg`)) x$formats$`image/jpeg` else NA_character_
+          )
         }
-        # Collapsing vector into one element
-        authors.initial = paste(authors.initial, collapse = "|")
-        # Pasting to author variable
-        authors = c(authors, authors.initial)
-      }else{
-        authors = c(authors, NA)
-      }
-
-    }
-
-    # Checking break condition
-    if(is.null(response.content$`next`)){
-      break
-    }
-    
-    # Increasing page variable
-    page = page + 1
-
+      ) %>%
+      mutate(description = str_remove_all(description, "\\(This is an automatically generated summary.\\)|\\\""))
+  
+    # Declare object to be outputed
+    return(output.data)
   }
-
-  # Create dataset
-  book.data = tibble(
-    title,
-    description,
-    language,
-    genre,
-    tags,
-    authors
-  )
-
-  # Modifying the dataset
-  book.data = book.data %>%
-    mutate(
-      title = str_remove(title, ";.*"),
-      description = str_remove_all(description, "\\\"|\\(This is an automatically generated summary.\\)"),
-      genre = str_replace_all(genre, " &|/", ","),
-      authors = str_remove_all(authors, ",|\\(|\\)|.\\."),
-      authors = str_replace_all(authors, "  ", " ")
-    )
-
-  # Return dataset
-  return(book.data)
-
-}
 book.data = get.book.data()
 book.data
 
 # Save data into needed folder using the write.csv function below
-# write.csv(book.data, file = "---book.library.csv")
+# Due to size restrictions, they would be broken down into subsets
+# write.csv(book.data[(book.data$id %in% c(1:40000)),], file = "---book_library_first.csv")
+# write.csv(book.data[!(book.data$id %in% c(1:40000)),], file = "---book_library_second.csv")
 
 
 

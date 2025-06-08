@@ -168,7 +168,7 @@ rf.result %>%
 # Read book library into local environment
 book.library <-
 read.csv(
-  "https://raw.githubusercontent.com/Erhun-Joel/book-recommedation-system/refs/heads/main/Gutendex%20API%20response/book_library.csv"
+  "https://raw.githubusercontent.com/Erhun-Joel/book-recommendation-system/refs/heads/main/Gutendex%20API%20response/book_library.csv"
 ) %>%
   as_tibble()
 book.library
