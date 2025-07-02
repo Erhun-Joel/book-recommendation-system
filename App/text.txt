@@ -1,0 +1,6 @@
+Image References:
+1. person_reading.jpg from Go to Giorgio Trovato (unsplash link = "https://unsplash.com/@giorgiotrovato")
+
+2. website_icon.jpeg by acworks (silhouette-ac link = "https://en.silhouette-ac.com/silhouette/135827")
+
+3. placeholder_image.jpg from freepik (link = "https://www.freepik.com/free-vector/question-mark-sign-brush-stroke-trash-style-typography-vector_18722294.htm#fromView=search&page=1&position=2&uuid=80dfcea0-73da-4f5c-a3e6-4049ead60acb&query=question+mark")

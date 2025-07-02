@@ -1,0 +1,298 @@
+/* Applying to all elements of the html file */
+
+* {
+    box-sizing: border-box;
+    font-family: "Edu NSW ACT Hand Pre", cursive;
+    margin: 0;
+    padding: 0;
+}
+
+* a {
+    text-decoration: none;
+}
+
+* a:visited {
+    text-decoration: none;
+}
+
+/* Cover Page */
+.cover {
+    height: 100vh;
+    background-image: linear-gradient(rgba(33, 34, 38, 0.7), rgba(33, 34, 38, 0.7)), url("images/person_reading.jpg");
+    background-position: center;
+    background-size: cover;
+}
+
+.app_logo {
+    display: flex;
+    align-items: center;
+    padding: 20px 30px;
+}
+
+.app_logo i {
+    font-size: 8vw;
+    color: rgb(208, 7, 7);
+}
+
+.app_logo span p {
+    font-size: 2.5vw;
+    margin-left: 15px;
+    color: rgb(208, 7, 7);
+}
+
+.title {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    transform: translate(-50%, -50%)
+}
+
+.title h2 {
+    font-size: 60px;
+    padding: 20px;
+    color: #fff;
+    font-weight: 900;
+}
+
+.title h3, h4 {
+    color: #dedede;
+    padding: 0;
+}
+
+/* Actual Content */
+
+/* The Entire Content Page */
+#content {
+    height: 100vh;
+    background-color: rgb(201, 201, 201);
+}
+
+/* Division of body and footer */
+#content_body{
+    height: 90%;
+    display: flex;
+    justify-content: center;
+}
+
+#content_footer {
+    height: 10%;
+    margin-top: 3px;
+    background-color: antiquewhite;
+    
+}
+
+/* Actual inputs and outputs */
+.content_body_actual {
+    width: 70vw;
+    height: 85vh;
+    display: flex;
+    padding-top: 70px;
+}
+
+.inputs {
+    height: 100%;
+    width: 30%;
+}
+
+.outputs {
+    height: 100%;
+    width: 70%;
+    border: 1px solid rgb(220, 22, 22);
+    margin-block: 0;
+}
+
+.text_div {
+    width: 95%;
+    margin: auto;
+}
+
+.text_div div {
+    width: 100% !important;
+}
+
+/* Text Area input configuration */
+
+.text_div textarea {
+    width: 100%;
+    resize: none;
+    margin-bottom: 15px;
+    height: 250px;
+    border: 1px solid rgb(220, 22, 22);
+    padding: 10px;
+}
+
+.text_div textarea:focus {
+    outline: 0;
+    box-shadow: 0 0 3px rgb(220, 22, 22);
+}
+
+/* Button configuration */
+
+.btn_inputs {
+    width: 95%;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+}
+
+.submit_btn {
+    width: 56%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    height: 60px;
+    border: 1px solid rgb(220, 22, 22);
+    color: rgb(220, 22, 22);
+    background-color: rgb(201, 201, 201);
+    transition: 0.5s;
+}
+
+.submit_btn:hover {
+    color: #fff;
+    background-color: rgb(220, 22, 22);
+    cursor: pointer;
+}
+
+.reset_btn {
+    width: 40%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    height: 60px;
+    border: 1px solid rgb(220, 22, 22);
+    color: rgb(220, 22, 22);
+    background-color: rgb(201, 201, 201);
+    transition: 0.5s;
+}
+
+.reset_btn:hover {
+    color: #fff;
+    background-color: rgb(220, 22, 22);
+    cursor: pointer;
+}
+
+.outputs > div {
+    height: 100%;
+    width: 100%;
+}
+
+.outputs p {
+    margin: 0;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding: 0 !important;
+    line-height: 1.5;
+    margin-left: 5px;
+    margin-right: 5px;
+    text-align: center;
+}
+
+#icon_div{
+    display: flex;
+    align-items: center;
+}
+
+#icon_div i {
+    transition: 0.5s;
+}
+
+#icon_div i:hover {
+    color: rgb(220, 22, 22);
+    font-size: 17px;
+}
+
+#icon_div i {
+    margin-block: 0;
+    cursor: pointer;
+}
+
+.pheripherials {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 5%;
+}
+
+.movement_btn {
+    width: 46%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    height: 100%;
+    border: 0;
+    color: rgb(40, 40, 40);
+    background-color: rgb(201, 201, 201);
+    transition: 0.5s;
+}
+
+.movement_btn:hover {
+    color:rgb(220, 22, 22);
+    font-size: 17px;
+}
+
+#content_footer {
+    display: flex;
+    justify-content: space-between;
+}
+
+#content_footer > div {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#content_footer > div > p {
+    font-size: 12px;
+    text-align: center;
+}
+
+#content_footer i {
+    font-size: 48px;
+    color: rgb(59, 59, 59);
+    transition: 0.5s;
+}
+
+#content_footer i:hover {
+    font-size: 52px;
+    color: rgb(11, 11, 11);
+    cursor: pointer;
+}
+
+#meta_info {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#meta_info p {
+    font-size: 10px;
+}
+
+@media(max-width: 700px){
+    .title h2 {
+        font-size: 25px;
+    }
+
+    #content_footer > div > p {
+        font-size: 10px;
+        text-align: center;
+    }
+
+    #content_footer i {
+        font-size: 42px;
+    }
+    
+    #content_footer i:hover {
+        font-size: 48px;
+    }
+}
+
+/* style = "height: 20%; display: flex; align-content: center; justify-content: center;" */
+/* 
+div(
+            tags$i(" READ BOOK", class = "fa-solid fa-book", style = "padding-left: 5px;"),
+            style = "padding: 0 !important; margin: 0 !important;"
+          ),
+*/

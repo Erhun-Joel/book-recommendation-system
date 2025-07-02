@@ -1,4 +1,5 @@
-# Loading library
 library(shiny)
 library(shinycssloaders)
-library(tidyverse)
+
+source("www/input_components.R")
+source("www/output_components.R")
