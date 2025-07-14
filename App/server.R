@@ -11,7 +11,7 @@ server <- function(input, output, session) {
   )
 
   # Loading probabilities csv
-  probabilities <- read.csv("https://raw.githubusercontent.com/Erhun-Joel/book-recommendation-system/refs/heads/main/Data/Models probabilities/Selected/probabilities.csv") %>%
+  probabilities <- read.csv("https://raw.githubusercontent.com/Erhun-Joel/book-recommendation-system/refs/heads/main/Data/Models%20probabilities/Selected/probabilities.csv") %>%
     select(id, .pred_anger, .pred_fear, .pred_joy, .pred_love, .pred_sadness, .pred_surprise) %>%
     tidyr::pivot_longer(.pred_anger:.pred_surprise, names_to = "emotion")
 
