@@ -3,5 +3,5 @@
 # ui template
 ui <- htmlTemplate(
   filename = "www/index.html",
-  output_ui = uiOutput("output_ui")
+  output_ui = withSpinner(uiOutput("output_ui"), type = 8, color = "red")
 )

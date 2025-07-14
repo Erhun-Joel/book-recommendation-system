@@ -18,6 +18,8 @@
 /* Cover Page */
 .cover {
     height: 100vh;
+    min-height: 700px;
+    min-width: 650px;
     background-image: linear-gradient(rgba(33, 34, 38, 0.7), rgba(33, 34, 38, 0.7)), url("images/person_reading.jpg");
     background-position: center;
     background-size: cover;
@@ -30,12 +32,12 @@
 }
 
 .app_logo i {
-    font-size: 8vw;
+    font-size: 4vw;
     color: rgb(208, 7, 7);
 }
 
 .app_logo span p {
-    font-size: 2.5vw;
+    font-size: clamp(1.5vw, 1.75vw, 2vw);
     margin-left: 15px;
     color: rgb(208, 7, 7);
 }
@@ -66,6 +68,8 @@
 #content {
     height: 100vh;
     background-color: rgb(201, 201, 201);
+    min-height: 700px;
+    min-width: 650px;
 }
 
 /* Division of body and footer */
@@ -85,6 +89,7 @@
 /* Actual inputs and outputs */
 .content_body_actual {
     width: 70vw;
+    min-width: 600px;
     height: 85vh;
     display: flex;
     padding-top: 70px;
@@ -97,6 +102,7 @@
 
 .outputs {
     height: 100%;
+    min-height: 500px;
     width: 70%;
     border: 1px solid rgb(220, 22, 22);
     margin-block: 0;
@@ -177,6 +183,11 @@
     width: 100%;
 }
 
+#output_ui {
+    height: 100%;
+    width: 100%;
+}
+
 .outputs p {
     margin: 0;
     margin-top: 0 !important;
@@ -214,6 +225,14 @@
     height: 5%;
 }
 
+.pheripherials i {
+    font-size: 8px;
+}
+
+#book_link {
+    color: rgb(42, 42, 42);
+}
+
 .movement_btn {
     width: 46%;
     margin: 0;
@@ -244,7 +263,7 @@
 }
 
 #content_footer > div > p {
-    font-size: 12px;
+    font-size: 11px;
     text-align: center;
 }
 
@@ -270,13 +289,13 @@
     font-size: 10px;
 }
 
-@media(max-width: 700px){
+@media(max-width: 750px){
     .title h2 {
         font-size: 25px;
     }
 
     #content_footer > div > p {
-        font-size: 10px;
+        font-size: 7px;
         text-align: center;
     }
 
@@ -289,10 +308,7 @@
     }
 }
 
-/* style = "height: 20%; display: flex; align-content: center; justify-content: center;" */
-/* 
-div(
-            tags$i(" READ BOOK", class = "fa-solid fa-book", style = "padding-left: 5px;"),
-            style = "padding: 0 !important; margin: 0 !important;"
-          ),
-*/
+/* Scroll bar settings */
+::-webkit-scrollbar-thumb {
+    background-color: rgb(221, 28, 28);
+}
