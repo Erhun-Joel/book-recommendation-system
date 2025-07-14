@@ -52,8 +52,6 @@ server <- function(input, output, session) {
 
       similar_id(sample(x = unique(probabilities[["id"]]), size = 10, replace = FALSE))
       
-      print(paste0("first.id: ", first.id))
-
       second.id <-
       probabilities[probabilities$id %in% first.id,] %>%
         filter(emotion != results[6]) %>%
@@ -61,7 +59,6 @@ server <- function(input, output, session) {
         top_n(n = 1, wt = value) %>%
         filter(emotion == results[5]) %>%
         pull(id)
-      print(paste0("second.id: ", second.id))
 
       if(length(second.id) >= 10) similar_id(second.id)
 
@@ -72,7 +69,6 @@ server <- function(input, output, session) {
         top_n(n = 1, wt = value) %>%
         filter(emotion == results[4]) %>%
         pull(id)
-      print(paste0("third.id: ", third.id))
 
       if(length(third.id) >= 10) similar_id(third.id)
     } else {
@@ -86,7 +82,6 @@ server <- function(input, output, session) {
       selected_id(NULL)
     }
 
-    print(paste0("similar_id: ", similar_id()))
   })
 
   # Getting the equivalent resources from gutenberg api
@@ -126,7 +121,6 @@ server <- function(input, output, session) {
           ) %>%
           mutate(description = str_remove_all(description, "\\(This is an automatically generated summary.\\)|\\\""))
       
-      print(output.data)
       book_results(output.data)
           
     } else {
@@ -178,7 +172,6 @@ server <- function(input, output, session) {
         )
       )
     } else {
-      print(book_results())
 
       return(
         tagList(
