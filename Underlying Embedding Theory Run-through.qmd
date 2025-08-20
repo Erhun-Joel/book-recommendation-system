@@ -1,0 +1,203 @@
+---
+title: "Calculating word embeddings of random wikipedia articles using Singular Value Decomposition"
+format: html
+---
+
+## Summary
+While going back to work on the underlying model of this reccommendation system, I realized I did not have a perfect grasp of the theory behind the creation of word embeddings. This workbook is an attempt to rectify this. In it, I web-scraped random wikipedia articles, create a word corpus and perform Singular Value Decomposition on them, sort of like practice. The results are quite impressive.
+
+## Data Collection
+Wikipedia provides a url that spits out random articles. Unfortunately, this cannot be seeded either in R on in wikipedia itself (as far as I know). Therefore, every iteration of this practice session would give differing results. However, I beleive the uderlying insights would be the same.
+
+```{r}
+# --- Loading necessary libraries
+library(rvest)
+library(dplyr)
+library(stringr)
+library(tidytext)
+library(tidyr)
+library(SnowballC)
+```
+
+Now to create a function to pull out the words of random wikipedia articles
+
+```{r}
+# Creating function to collect text from random wikipedia pages
+get.wiki.corpus <-
+function(documents){
+  i = 1
+
+  output <- tibble()
+
+  while (i <= documents) {
+    page = read_html("https://en.wikipedia.org/wiki/Special:Random")
+
+    title = page %>%
+      html_nodes("h1") %>%
+      html_text %>%
+      paste0(collapse = "|")
+
+    text <-
+    page %>%
+      html_nodes("p") %>%
+      html_text %>%
+      paste0(collapse = ". ")
+
+    output <- output %>%
+      bind_rows(
+        tibble(
+          title = title,
+          text = text 
+        )
+      )
+    
+    i = i + 1
+
+  }
+  
+  return(output)
+}
+wiki.corpus <- get.wiki.corpus(documents = 2500)
+wiki.corpus
+```
+
+## Data Cleaning
+Due to scope of excersise, minimal cleaning would be done. Only the removal of paragraph annotation and wikipedia reference boxes.
+
+```{r}
+# adding row number and perform minimal cleaning
+wiki.corpus <- wiki.corpus %>%
+  mutate(
+    document = row_number(),
+    text = str_remove_all(text, "\\n|\\[\\d+\\]")
+  ) %>%
+  select(document, title, text)
+wiki.corpus
+```
+
+## Data Formating
+The arrangement for the training of embeddings would be documents in rows, words in columns and term frequency - inverse document frequency as values. This would be the end goal of data formating. Firstly, I calculate the tf_idf of all words per document.
+
+```{r}
+# making tfidf values
+wiki.tfidf <-
+wiki.corpus %>%
+  select(document, text) %>%
+  unnest_tokens(word, text, token = "words") %>%
+  group_by(document) %>%
+  count(word) %>%
+  filter(word != "") %>%
+  bind_tf_idf(term = word, document = document, n = n)
+wiki.tfidf
+```
+
+Then, I cast into a sparse matrix for smaller size and efficiency.
+
+```{r}
+# create a sparse matrix
+wiki.sparse <-
+wiki.tfidf %>%
+  group_by(document) %>%
+  cast_sparse(row = document, column = word, value = tf_idf)
+wiki.sparse[1:10, 1:10]
+```
+
+## Mathematical Background and Computation
+
+The mathematical methodlogy being used is Singular Vaue Decomposition, which is essentially a way to factorize or break down a matrix into three matrixes. The formula is given below:
+
+$$
+A = U \Sigma V^T
+$$
+
+Manually breaking them down would required finding the eigen values for $ AA^T $ in the case of $ U $ (left singular matrix) or  $ A^TA $ in the case of $ V $ (right singular matrix). Luckily, base R gives us a method for tackling this: 
+
+```{r}
+# Declare number of dimensions to be trained for
+dimension_num <- 400
+
+# Use base function to perform Singular Value Decomposition
+wiki.svd <- svd(wiki.sparse, nu = dimension_num, nv = dimension_num)
+str(wiki.svd)
+```
+
+Note that the dimensions are restricted to 400 to avoid computation of all dimensions.
+
+The explaination for the results of Singular Value Decomposition is pretty straight forward. The multiplication of $ U\Sigma $ gives rise to the projection of the documents into the feature space. This could be used directly for prediction. On the other hand, $ V\Sigma $ are the individual word embeddings in the same feature space. They can be used to break down a sentence into its document embedding.
+
+Before we continue, lets make a function that calculates the cosine of the angle between two vectors. Angles that are close to each other would have values closer to 1, other angles with values closer to -1 show great dismilarity and 0 can be infered as being neutral.
+
+```{r}
+cosine_similarity <- function(token, data, target_variable = "document"){
+  data_matrix = as.matrix(data %>% select_if(!str_detect(colnames(.), target_variable)))
+
+  rownames(data_matrix) = data[[target_variable]]
+  colnames(data_matrix) = paste0("dim_", 1:ncol(data_matrix))
+
+  token_matrix = matrix(data_matrix[rownames(data_matrix) == token,], nrow = 1)[rep(1, nrow(data_matrix)),]
+
+  result = rowSums(data_matrix * token_matrix) / (sqrt(rowSums(data_matrix ^ 2)) * (sqrt(rowSums(token_matrix ^ 2))))
+
+  output = tibble(
+    document = names(result),
+    cosine = result
+  )
+
+  return(output)
+
+}
+```
+
+## Results and Review
+
+Now, lets make our document embedding.
+
+```{r}
+document.embeddings <- (wiki.svd$u %*% diag(wiki.svd$d[1:dimension_num])) %>%
+  as_tibble() %>%
+    mutate(
+      document = wiki.corpus$title
+    ) %>%
+    select(document, everything())
+document.embeddings
+```
+
+If prediction was the goal of this project, this would be the training set.
+
+Since this represents the position of various wikipedia articles in the trained vector stage, lets see which articles are close to each other.
+
+```{r}
+cosine_similarity(token = document.embeddings$document[1], data = document.embeddings) %>%
+  arrange(-cosine) %>%
+  print(n = 20)
+```
+
+Because of the random nature of the wikipedia url response, i cannot make definite analysis of the results. However, the first three or four articles should prove similar.
+
+Now lets make a word embedding corpus.
+
+```{r}
+word.embeddings <- (wiki.svd$v %*% diag(wiki.svd$d[1:dimension_num])) %>%
+  as_tibble() %>%
+    mutate(
+      word = colnames(wiki.sparse)
+    ) %>%
+    select(word, everything())
+word.embeddings
+```
+
+This repressents every word that exist in the response. It represents every word in `dimension_num` dimensions, putting words that are similar in closer proximity to each other. Lets use the word "actor" since its quite popular in wikipedia and see which word is close to it
+
+```{r}
+cosine_similarity(token = "actor", data = word.embeddings, target_variable = "word") %>%
+  arrange(-cosine) %>%
+  print(n = 20)
+```
+
+Again not sure what the result will be but i am willing to bet that words related to movies would be represented. Related words you could see would include movie studios, movie jobs such as "director" or film related adjectives.
+
+$$
+\text{Success!}
+$$
+
+Now to apply to actual project.
