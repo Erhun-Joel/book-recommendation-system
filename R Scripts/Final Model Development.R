@@ -182,7 +182,7 @@ book.library
 
 # Read rds model back from github
 rf.fit <-
-readRDS(gzcon(url("https://raw.githubusercontent.com/Erhun-Joel/book-recommendation-system/refs/heads/main/rf_fit.rds")))
+readRDS(gzcon(url("https://github.com/Erhun-Joel/book-recommendation-system/raw/refs/heads/main/Models/rf_fit.rds")))
 rf.fit
 
 # Get list of probabilities using rf.result's model
