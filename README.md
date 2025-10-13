@@ -8,7 +8,7 @@ To accurately relate word corpuses to emotions experienced by humans and as a si
 ### Data
 The main data used is gotten from Kaggle website and contains various sentences with emotion pairs. Six emotions are identified in total: sadness, joy, surprise, fear, anger and love. The link to the data is found [here](https://www.kaggle.com/datasets/praveengovi/emotions-dataset-for-nlp).
 
-Information on the books to be recommended where gotten from the the [gutenberg project](https://www.gutenberg.org/) api directly which is free to use. Other data sets in this project are manually setup.
+Information on the books to be recommended are gotten from the the [gutenberg project](https://www.gutenberg.org/) api directly which is free to use. Other data sets in this project are manually setup.
 
 ### Models
 Model development in this project is divided into two main parts:
