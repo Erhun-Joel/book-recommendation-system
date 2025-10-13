@@ -31,7 +31,8 @@ cd "<docker assembly directory>"
 docker-compose up --build
 ```
 If terminal is opened in project folder, you may skip the first line of code.
-Note: This App differs from the online version and involves setting up an api powered by an SQLite lookup database to select book recommendations and the web app involved with user interaction.
+
+***Note:*** This App differs from the online version and involves setting up an api powered by an SQLite lookup database and the web app for with user interaction.
 
 ### Shortcomings and Future Updates
 After engagement with this project, it is obvious that model performance leaves a lot to be desired. The main reason behind this is data quality. The data sourced for this does not seem to emulate common speech in the English language. Also, there seems to not be enough samples to justify more advanced context-aware variable generating methods.
