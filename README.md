@@ -36,6 +36,7 @@ If terminal is opened in project folder, you may skip the first line of code.
 
 ### Shortcomings and Future Updates
 After engagement with this project, it is obvious that model performance leaves a lot to be desired. The main reason behind this is data quality. The data sourced for this does not seem to emulate common speech in the English language. Also, there seems to not be enough samples to justify more advanced context-aware variable generating methods.
+
 The gutenberg project used in this project as a library of books also tends to contain older books related to classic literature, avioding copyright infringments that comes with copying and uploading more modern books.
 
 Future improvements coming up would includes:
