@@ -33,7 +33,7 @@ emotions.tfidf[1:7, 1:7]
 
 # Breaking tfidf values down using SVD
 tfidf.svd.results <-
-irlba::irlba(emotions.tfidf, nv = 500)
+irlba::irlba(emotions.tfidf, nv = 400)
 
 # Getting documment embeddings from matrix factorization
 document.embedding <-
@@ -84,7 +84,7 @@ library(keras3)
 
 # Construct dense neural network
 neural.network <- keras_model_sequential() %>%
-  layer_dense(units = 1000, activation = "relu", input_shape = 500) %>%
+  layer_dense(units = 1000, activation = "relu", input_shape = 400) %>%
   layer_dense(units = 100, activation = "relu") %>%
   layer_dense(units = 6, activation = "softmax")
 neural.network

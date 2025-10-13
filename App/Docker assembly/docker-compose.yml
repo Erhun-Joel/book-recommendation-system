@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  project_api:
+    build: ./API
+    container_name: project_api
+    ports:
+      - 5101:5101
+    restart: unless-stopped
+
+  project_app:
+    build: ./WebApp
+    container_name: project_app
+    ports:
+      - 5100:5100
+    restart: unless-stopped
+    depends_on:
+      - project_api

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta files -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Set website icon -->
+     <link rel = "icon" href = "images/website_icon.jpeg">
+
+    <!-- Stylesheet links -->
+    <link rel = "stylesheet" href = "styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Hand+Pre:wght@400..700&display=swap" rel="stylesheet">
+
+    <!-- Link Shiny with javascript and css dependencies -->
+     {{headContent()}}
+
+    <title>GetRead</title>
+</head>
+<body>
+
+    <!-- Cover Section -->
+    <section class = "cover">
+        <div class = "app_logo">
+            <i class="fa-solid fa-book-open-reader"></i>
+            <span><p>GetRead</p></span>
+        </div>
+        <div class = "title">
+            <h2>Use this App to Get Your Next Best Read!</h2>
+            <h3>A mind needs books as a sword needs a whetstone, if it is to keep its edge <br></h4>
+            <h4>- Tyrion Lannister</h3>
+        </div>
+    </section>
+
+    <!-- Actual App -->
+     <section id = "content">
+        <section id = "content_body">
+            <div class = "content_body_actual">
+                <div class = "inputs">
+                    <div class = "text_div">
+                        {{emotion_text}}
+                    </div>
+                    <div class = "btn_inputs">
+                        {{submit_button}}
+                        {{reset_button}}
+                    </div>
+                </div>
+                <div class = "outputs">
+                    {{output_ui}}
+                </div>
+            </div>
+        </section>
+        <section id = "content_footer">
+            <div style = "width: 70%;">
+                <p>
+                    Various models may be put in play to predict the emotions felt by the user from the text. 
+                    Such models could range from simple random forests to neural networks, trained on simple word frequency counts to specially created word vectors.
+                    To learn more about this project, kindy visit the github repository.
+                </p>
+            </div>
+            <div style = "width: 30%;">
+                <a target = "_blank" href = "https://github.com/Erhun-Joel/book-recommendation-system">
+                    <i class = "fa-brands fa-github"></i>
+                </a>
+            </div>
+        </section>
+     </section>
+</body>
+</html>
