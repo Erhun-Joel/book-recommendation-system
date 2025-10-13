@@ -28,10 +28,6 @@ server <- function(input, output, session) {
       )
     )
 
-  })
-
-  # Getting the equivalent resources from gutenberg api
-  observe({
     if(!is.null(selected_id())) {
       ids <- selected_id()
 
@@ -73,6 +69,11 @@ server <- function(input, output, session) {
       book_results(NULL)
     }
 
+  })
+
+  # Getting the equivalent resources from gutenberg api
+  observeEvent(input$reset, {
+    updateTextInput(inputId = "text_input", label = NULL, value = "", placeholder = "Tell us how you feel. We will reccommend something for you to read!")
   })
 
   # Modifying index when next button is clicked
